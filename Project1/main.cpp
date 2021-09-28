@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -26,11 +27,13 @@ bool _isPaused = false;
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	// TODO: Key callbacks for playing sound and whatnot
+	SoundObject temp(_system);
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		//_result = _system->playSound(_sound, 0, false, &_channel);
 		//if (_result != FMOD_OK) {
 		//	fprintf(stderr, "Unable to play sound");
 		//}
+		glfwSetWindowShouldClose(window,GLFW_TRUE);
 	}
 }
 
@@ -55,7 +58,11 @@ int main(int argc, char* argv)
 
 	while (!glfwWindowShouldClose(_window)) 
 	{
-
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//_text->render();
+		glfwSwapBuffers(_window);
+		glfwPollEvents();
 	}
 
 	shutDown();
@@ -158,7 +165,7 @@ void shutDown() {
 		delete _text;
 		_text = nullptr;
 	}
-
+	
 
 	exit(EXIT_SUCCESS);
 }
