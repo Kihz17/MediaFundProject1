@@ -1,0 +1,16 @@
+===== City/Forest/Ambience ====
+background_crowd_people_chatter_loop_02
+bird_small_song_call_chirp_02
+
+==== returning from lake ====
+music_calm_green_lake_serenade
+crickets_chirping_night_ambience_loop
+fantasy_jungle_forrest_loop_01
+swamp_bayou_frogs_birds_daytime_loop1
+
+===== Terrible Revelation === 
+cinematic_LowDrone1
+bird_crow_call_caw_squawk_01
+shimmer_sparkle_loop_02
+music_cinematic_reveal
+cinematic_deep_low_whoosh_impact_02
