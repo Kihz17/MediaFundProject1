@@ -1,24 +1,25 @@
 #pragma once
 #include "SoundUtils.h"
 
-FMOD::Sound* CreateSound(FMOD::System* system, std::string audioFile)
+FMOD::System* _system = NULL;
+FMOD_RESULT _result = FMOD_OK;
+std::map<std::string, FMOD::Sound*> sounds;
+
+FMOD::Sound* CreateSound(FMOD::System* system, std::string audioFile, std::string soundName)
 {
 	std::stringstream ss;
 	ss << SOLUTION_DIR << "common\\assets\\audio\\" << audioFile;
 
 	FMOD::Sound* sound = NULL;
-	FMOD_RESULT result = system->createSound(ss.str().c_str(), FMOD_LOOP_OFF, 0, &sound);
+	_result = system->createSound(ss.str().c_str(), FMOD_LOOP_OFF, 0, &sound);
 
-	if (result != FMOD_OK) {
+	if (_result != FMOD_OK) {
 		fprintf(stderr, "Unable to create sound.");
 		return NULL;
 	}
 
+	sounds.insert(std::pair<std::string, FMOD::Sound*>(soundName, sound)); // Store our newly loaded sound into a map indexed by the soundName
+
 	ss.flush();
 	return sound;
-}
-
-void PlaySound(FMOD::System* system, FMOD::Sound* sound, bool isPaused, FMOD::Channel** channel)
-{
-	system->playSound(sound, 0, isPaused, channel);
 }

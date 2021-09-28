@@ -6,8 +6,9 @@
 #include <GLFW/glfw3.h>
 
 #include <rssgl/GLText.h>
+
 #include "SoundObject.h"
-#include "SoundUtils.h"
+
 const int maxFmodChannels = 32;
 
 GLuint _windowWidth = 1024;
@@ -15,9 +16,6 @@ GLuint _windowHeight = 768;
 
 GLFWwindow* _window = NULL;
 std::string _appName = "Project 1";
-
-FMOD::System* _system = NULL;
-FMOD_RESULT _result = FMOD_OK;
 
 RSS::GLText* _text;
 GLuint _textRowIndex = 2;
@@ -52,10 +50,21 @@ int main(int argc, char* argv)
 		exit(EXIT_FAILURE);
 	}
 
+	_text->addLine("First text", _textRowIndex++);
+	GLuint lastKnownRowIndex = _textRowIndex;
 
 	while (!glfwWindowShouldClose(_window)) 
 	{
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		lastKnownRowIndex = _textRowIndex;
+		_text->addLine("Test line", lastKnownRowIndex++);
+
+		_text->render();
+
+		glfwSwapBuffers(_window);
+		glfwPollEvents();
 	}
 
 	shutDown();
@@ -135,6 +144,12 @@ bool initFMOD() {
 		return false;
 	}
 
+	// TODO: Load our sound files in
+	//for ()
+	//{
+	//	CreateSound(_system, );
+	//}
+
 	return true;
 }
 
@@ -142,7 +157,18 @@ void shutDown() {
 
 	glfwTerminate();
 
-	// TODO: Call destructor on all created SoundObjects to make sure their Sound*'s get released
+	// Release all of our sounds from memory
+	std::map<std::string, FMOD::Sound*>::iterator it = sounds.begin();
+	while (it != sounds.end())
+	{
+		FMOD::Sound* sound = it->second;
+		_result = sound->release();
+		if (_result != FMOD_OK)
+		{
+			fprintf(stderr, "Unable to release sound");
+		}
+	}
+	sounds.clear();
 
 	_result = _system->close();
 	if (_result != FMOD_OK) {
