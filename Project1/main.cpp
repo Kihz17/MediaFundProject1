@@ -7,7 +7,7 @@
 
 #include <rssgl/GLText.h>
 
-#include "SoundObject.h"
+#include "SoundUtils.h"
 
 const int maxFmodChannels = 32;
 

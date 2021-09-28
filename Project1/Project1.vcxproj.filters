@@ -24,15 +24,9 @@
     <ClCompile Include="SoundUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SoundObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SoundUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SoundObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

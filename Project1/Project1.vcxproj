@@ -153,11 +153,9 @@
   <ItemGroup>
     <ClCompile Include="..\Extern\gl.c" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="SoundObject.cpp" />
     <ClCompile Include="SoundUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SoundObject.h" />
     <ClInclude Include="SoundUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
