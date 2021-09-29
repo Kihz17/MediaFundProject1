@@ -19,6 +19,7 @@ GLuint _windowHeight = 768;
 
 GLFWwindow* _window = NULL;
 std::string _appName = "Project 1";
+FMOD::Channel* _channel = NULL;
 
 bool _isPaused = false;
 
@@ -91,10 +92,25 @@ int main(int argc, char* argv)
 		{
 			StoryStep step = story.GetNextLine();
 			theEnd = step.isLast;
-			//TODO play step.theme case exists otherwise keep the last playing
+			//play step.theme case exists otherwise keep the last playing
+			if (step.theme != "") {
+				std::cout << "Playing Theme: " << step.theme << std::endl;
+				CreateSound(_system, step.theme, step.theme);
+				PlaySound(_channel, step.theme, false);
+
+			}
 			//Show Story description on window on a different line
 			RenderText(shader, step.description, 300.0f , 300.0f + lineSpace, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-			//TODO play the effects list in order step.effects
+			//play the effects list in order step.effects
+			if (step.effects.size()>0) {
+				for (int i = 0; i < step.effects.size(); i++)
+				{
+					std::string effect = step.effects.at(i);
+					std::cout << "Playing Effect: " << effect << std::endl;
+					CreateSound(_system, effect, effect);
+					PlaySound(_channel, effect, false);
+				}
+			}
 			std::this_thread::sleep_for(std::chrono::seconds(step.waitTime));
 			glfwSwapBuffers(_window);
 			glfwPollEvents();

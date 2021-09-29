@@ -42,7 +42,6 @@
 
 	StoryScript::~StoryScript()
 	{
-		delete story;
 	}
 
 	StoryStep StoryScript::GetNextLine()
