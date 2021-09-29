@@ -35,7 +35,7 @@
 		story[6].description = "When he arrived at Hazelward, everyone in the city have become a stone...";
 		story[6].theme = "cinematic_LowDrone1.wav";
 		story[6].effects = { "bird_crow_call_caw_squawk_01.wav", "shimmer_sparkle_loop_02.wav", "music_cinematic_reveal.wav", "cinematic_deep_low_whoosh_impact_02.wav" };
-		story[4].waitTime = 7;
+		story[6].waitTime = 7;
 		story[6].isLast = 1;
 
 	}
