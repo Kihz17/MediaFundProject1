@@ -17,8 +17,9 @@ void RenderText(Shader* s, std::string text, float x, float y, float scale, glm:
 	{
 		Character characterObject = characters[*c]; // Get our mapped character
 
+		bool special = *c == 'p' || *c == 'P' || *c == 'g'|| *c == 'y' || *c == 'Y' || *c == 'j' || *c == 'J';
 		float xPos = x + characterObject.Bearing.x * scale;
-		float yPos = y + (characterObject.Size.y - characterObject.Bearing.y) * scale;
+		float yPos = y + (characterObject.Size.y - characterObject.Bearing.y) * scale - (special ? 10.0f : 0.0f);;
 		float width = characterObject.Size.x * scale;
 		float height = characterObject.Size.y * scale;
 

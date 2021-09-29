@@ -80,8 +80,8 @@ StoryStep story[7] =
 	{"He lived in the city of Hazelward over the top of the trees ...", "",  {}, 700},
 	{"He loved how the people there were so festive ....", "",  {}, 700},
 	{"Chepart used to enjoy fishing at Crystal lake every afternoon ...", "music_calm_green_lake_serenade.wav",  { "crickets_chirping_night_ambience_loop.wav", "swamp_bayou_frogs_birds_daytime_loop1.wav" }, 700},
-	{"One day he was returned from the lake and had a strange feeling ...", "",  { "fantasy_jungle_forrest_loop_01.wav" }, 700},
-	{"When he arrived at Hazelward, everyone in the city have become stone...", "cinematic_LowDrone1.wav",  { "bird_crow_call_caw_squawk_01.wav", "shimmer_sparkle_loop_02.wav", "music_cinematic_reveal.wav", "cinematic_deep_low_whoosh_impact_02.wav" }, 700},
+	{"One day he returned from the lake and had a strange feeling ...", "",  { "fantasy_jungle_forrest_loop_01.wav" }, 700},
+	{"When he arrived at Hazelward, everyone in the city had become stone...", "cinematic_LowDrone1.wav",  { "bird_crow_call_caw_squawk_01.wav", "shimmer_sparkle_loop_02.wav", "music_cinematic_reveal.wav", "cinematic_deep_low_whoosh_impact_02.wav" }, 700},
 };
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
