@@ -1,7 +1,8 @@
 #pragma once
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <thread>
+#include <chrono>
 #include <rssgl/GLText.h>
 
 #include <ft2build.h>
@@ -9,6 +10,7 @@
 
 #include "SoundUtils.h"
 #include "TextUtils.h"
+#include "StoryScript.h"
 
 const int maxFmodChannels = 32;
 
@@ -66,7 +68,9 @@ bool initGL();
 bool initFreeType();
 bool initFMOD();
 void shutDown();
+void PlayEffectForStep(int i) {
 
+}
 int main(int argc, char* argv) 
 {
 	if (!init()) {
@@ -78,15 +82,30 @@ int main(int argc, char* argv)
 	{
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		//Playing the story
+		StoryScript story = StoryScript();
+		bool theEnd = false;
+		const float lineSpace = 50.0f;
+		while(!theEnd)
+		{
+			StoryStep step = story.GetNextLine();
+			theEnd = step.isLast;
+			//TODO play step.theme case exists otherwise keep the last playing
+			//Show Story description on window on a different line
+			RenderText(shader, step.description, 300.0f , 300.0f + lineSpace, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+			//TODO play the effects list in order step.effects
+			std::this_thread::sleep_for(std::chrono::seconds(step.waitTime));
+			glfwSwapBuffers(_window);
+			glfwPollEvents();
+		}
 
-		RenderText(shader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-
-		glfwSwapBuffers(_window);
-		glfwPollEvents();
 	}
 
 	shutDown();
 }
+
+
 
 bool init() {
 

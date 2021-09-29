@@ -156,11 +156,14 @@
     <ClCompile Include="..\Extern\gl.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SoundUtils.cpp" />
+    <ClCompile Include="StoryScript.cpp" />
     <ClCompile Include="TextUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SoundUtils.h" />
+    <ClInclude Include="StoryScript.h" />
+    <ClInclude Include="StoryStep.h" />
     <ClInclude Include="TextUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
