@@ -387,3 +387,7 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+#Solution Exe build
+x64/Debug/Project1.*
+x64/Release/Project1.*
