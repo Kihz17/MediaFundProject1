@@ -27,9 +27,6 @@
     <ClCompile Include="TextUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StoryScript.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SoundUtils.h">
@@ -39,12 +36,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StoryScript.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StoryStep.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <thread>
 #include <chrono>
+#include <vector>
 #include <rssgl/GLText.h>
 
 #include <ft2build.h>
@@ -10,7 +11,6 @@
 
 #include "SoundUtils.h"
 #include "TextUtils.h"
-#include "StoryScript.h"
 
 const int maxFmodChannels = 32;
 
@@ -48,6 +48,42 @@ static const char* fragment_shader =
 
 Shader* shader;
 
+FMOD::Channel* bgmChannel = NULL;
+
+// Represents one "step" in the story
+struct StoryStep
+{
+	std::string description;
+	std::string theme;
+	std::vector<std::string> effects;
+	long waitTime;
+
+public:
+	void PlayTheme()
+	{
+		PlaySound(bgmChannel, theme, false);
+	}
+
+	void PlayEffects(FMOD::Channel* channel)
+	{
+		for (std::string effect : effects)
+		{
+			PlaySound(channel, effect, false);
+		}
+	}
+};
+
+StoryStep story[7] =
+{
+	{"Once Upon a time...", "background_crowd_people_chatter_loop_02.wav",  {"bird_small_song_call_chirp_02.wav"}, 700},
+	{"In the calm forest of Greenwood, there was a gnome called Chepart ...", "",  {}, 700},
+	{"He lived in the city of Hazelward over the top of the trees ...", "",  {}, 700},
+	{"He loved how the people there were so festive ....", "",  {}, 700},
+	{"Chepart used to enjoy fishing at Crystal lake every afternoon ...", "music_calm_green_lake_serenade.wav",  { "crickets_chirping_night_ambience_loop.wav", "swamp_bayou_frogs_birds_daytime_loop1.wav" }, 700},
+	{"One day he was returned from the lake and had a strange feeling ...", "",  { "fantasy_jungle_forrest_loop_01.wav" }, 700},
+	{"When he arrived at Hazelward, everyone in the city have become stone...", "cinematic_LowDrone1.wav",  { "bird_crow_call_caw_squawk_01.wav", "shimmer_sparkle_loop_02.wav", "music_cinematic_reveal.wav", "cinematic_deep_low_whoosh_impact_02.wav" }, 700},
+};
+
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	// TODO: Key callbacks for playing sound and whatnot
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -69,9 +105,7 @@ bool initGL();
 bool initFreeType();
 bool initFMOD();
 void shutDown();
-void PlayEffectForStep(int i) {
 
-}
 int main(int argc, char* argv) 
 {
 	if (!init()) {
@@ -79,43 +113,59 @@ int main(int argc, char* argv)
 		exit(EXIT_FAILURE);
 	}
 
-	while (!glfwWindowShouldClose(_window)) 
+	int effectChannelIndex = 0;
+	const int effectChannelsCount = 10;
+	FMOD::Channel* effectChannels[effectChannelsCount];
+
+	int currentStoryIndex = 0;
+	float lineHeight = 500.0f;
+	int storyLength = sizeof(story) / sizeof(story[0]);
+	int ticks = 0;
+	std::vector<std::pair<std::string, float>> linesToRender;
+	linesToRender.push_back(std::pair<std::string, float>(story[currentStoryIndex].description, lineHeight));
+
+	StoryStep step = story[currentStoryIndex];
+
+	while (!glfwWindowShouldClose(_window))
 	{
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		//Playing the story
-		StoryScript story = StoryScript();
-		bool theEnd = false;
-		const float lineSpace = 50.0f;
-		while(!theEnd)
-		{
-			StoryStep step = story.GetNextLine();
-			theEnd = step.isLast;
-			//play step.theme case exists otherwise keep the last playing
-			if (step.theme != "") {
-				std::cout << "Playing Theme: " << step.theme << std::endl;
-				CreateSound(_system, step.theme, step.theme);
-				PlaySound(_channel, step.theme, false);
 
-			}
-			//Show Story description on window on a different line
-			RenderText(shader, step.description, 300.0f , 300.0f + lineSpace, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-			//play the effects list in order step.effects
-			if (step.effects.size()>0) {
-				for (int i = 0; i < step.effects.size(); i++)
-				{
-					std::string effect = step.effects.at(i);
-					std::cout << "Playing Effect: " << effect << std::endl;
-					CreateSound(_system, effect, effect);
-					PlaySound(_channel, effect, false);
-				}
-			}
-			std::this_thread::sleep_for(std::chrono::seconds(step.waitTime));
-			glfwSwapBuffers(_window);
-			glfwPollEvents();
+		//Playing the story
+		bool finishedStory = currentStoryIndex >= storyLength;
+		if (!finishedStory)
+		{
+			step = story[currentStoryIndex];
 		}
 
+		if (!finishedStory && ticks != 0 && ticks % step.waitTime == 0)
+		{
+			if (effectChannelIndex >= effectChannelsCount)
+			{
+				fprintf(stderr, "Ran out of effect channels!");
+				return -1;
+			}
+
+			FMOD::Channel* currentEffectChannel = effectChannels[effectChannelIndex++];
+			// TODO: Do the sound modification here (frequency, volume, pitch, etc)
+
+			currentStoryIndex++;
+			lineHeight -= 60.0f;
+			linesToRender.push_back(std::pair<std::string, float>(story[currentStoryIndex].description, lineHeight));
+			step.PlayTheme();
+			step.PlayEffects(currentEffectChannel);
+		}
+
+		for (std::pair<std::string, float> pair : linesToRender)
+		{
+			RenderText(shader, pair.first, 100.0f, pair.second, 0.8f, glm::vec3(0.5, 0.8f, 0.2f));
+		}
+
+		std::cout << ticks << std::endl;
+
+		ticks++;
+		glfwSwapBuffers(_window);
+		glfwPollEvents();
 	}
 
 	shutDown();
