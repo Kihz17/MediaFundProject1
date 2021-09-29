@@ -11,6 +11,7 @@
 
 #include "SoundUtils.h"
 #include "TextUtils.h"
+#include "FileUtils.h"
 
 const int maxFmodChannels = 32;
 
@@ -49,6 +50,7 @@ static const char* fragment_shader =
 Shader* shader;
 
 FMOD::Channel* bgmChannel = NULL;
+std::vector<std::string> _audioAssetsList;
 
 // Represents one "step" in the story
 struct StoryStep
@@ -75,12 +77,12 @@ public:
 
 StoryStep story[7] =
 {
-	{"Once Upon a time...", "background_crowd_people_chatter_loop_02.wav",  {"bird_small_song_call_chirp_02.wav"}, 700},
-	{"In the calm forest of Greenwood, there was a gnome called Chepart ...", "",  {}, 700},
+	{"Once Upon a time...", "music_magical_story_intro.wav",  {"bird_small_song_call_chirp_02.wav"}, 700},
+	{"In the calm forest of Greenwood, there was a gnome called Chepart ...", "background_crowd_people_chatter_loop_02.wav",  {}, 700},
 	{"He lived in the city of Hazelward over the top of the trees ...", "",  {}, 700},
 	{"He loved how the people there were so festive ....", "",  {}, 700},
-	{"Chepart used to enjoy fishing at Crystal lake every afternoon ...", "music_calm_green_lake_serenade.wav",  { "crickets_chirping_night_ambience_loop.wav", "swamp_bayou_frogs_birds_daytime_loop1.wav" }, 700},
-	{"One day he returned from the lake and had a strange feeling ...", "",  { "fantasy_jungle_forrest_loop_01.wav" }, 700},
+	{"Chepart used to enjoy fishing at Crystal lake every afternoon ...", "music_calm_green_lake_serenade.wav",  { "river_stream_daytime_flowing_water_insects_birds_loop_01","crickets_chirping_night_ambience_loop.wav" }, 700},
+	{"One day he returned from the lake and had a strange feeling ...", "",  { "fantasy_jungle_forrest_loop_01.wav", "swamp_bayou_frogs_birds_daytime_loop1.wav" }, 700},
 	{"When he arrived at Hazelward, everyone in the city had become stone...", "cinematic_LowDrone1.wav",  { "bird_crow_call_caw_squawk_01.wav", "shimmer_sparkle_loop_02.wav", "music_cinematic_reveal.wav", "cinematic_deep_low_whoosh_impact_02.wav" }, 700},
 };
 
@@ -327,11 +329,13 @@ bool initFMOD() {
 		return false;
 	}
 
-	// TODO: Load our sound files in
-	//for ()
-	//{
-	//	CreateSound(_system, );
-	//}
+    _audioAssetsList = GetFilesFromIndex("audioAssetList.txt");
+
+	for (size_t i = 0; i < _audioAssetsList.size(); i++)
+	{
+		std::string soundName = _audioAssetsList.at(i);
+		CreateSound(_system, soundName, soundName);
+	}
 
 	return true;
 }
