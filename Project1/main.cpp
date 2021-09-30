@@ -23,6 +23,7 @@ std::string _appName = "Project 1";
 FMOD::Channel* _channel = NULL;
 
 bool _isPaused = false;
+bool _isMuted = false;
 float vol = 1.0f; //volume
 float pitch = 1.0f; //pitch which controls frequency which is proportional to speed
 float pos = 0; //position of audio coming out of headphone (left, right, or both)
@@ -100,6 +101,20 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 			_result = _channel->getPaused(&_isPaused);
 			_result = _channel->setPaused(!_isPaused);
 			_result = _channel->getPaused(&_isPaused);
+		}
+	}
+	//Cancel all music from playing
+	else if (key == GLFW_KEY_T && action == GLFW_PRESS) {
+		if (_channel) {
+			_result = _channel->stop();
+		}
+	}
+	//Mute
+	else if (key == GLFW_KEY_M && action == GLFW_PRESS) {
+		if (_channel) {
+			_result = _channel->getMute(&_isMuted);
+			_result = _channel->setMute(!_isMuted);
+			_result = _channel->getMute(&_isMuted);
 		}
 	}
 	//Volume control
