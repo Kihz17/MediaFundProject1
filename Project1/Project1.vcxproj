@@ -154,11 +154,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Extern\gl.c" />
+    <ClCompile Include="FileUtils.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SoundUtils.cpp" />
     <ClCompile Include="TextUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FileUtils.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SoundUtils.h" />
     <ClInclude Include="TextUtils.h" />
