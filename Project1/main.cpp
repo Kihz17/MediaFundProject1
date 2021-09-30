@@ -55,6 +55,7 @@ Shader* shader;
 
 std::vector<std::string> _audioAssetsList;
 FMOD::Channel* bgmChannel = NULL;
+FMOD::Channel* effChannel = NULL; //copy sound effects of effectChannels to _channel for editing purposes
 std::vector<FMOD::Channel*> effectChannels;
 
 std::map<std::string, FMOD::Channel*> playingSounds;
@@ -85,7 +86,8 @@ public:
 		FMOD::Channel* channel = NULL;
 		for (std::string effect : effects)
 		{
-			effectChannels.push_back(*PlaySound(channel, effect, false));
+			effChannel = *PlaySound(channel, effect, false);
+			//effectChannels.push_back(*PlaySound(channel, effect, false));
 			keys.push_back(effect);
 			playingSounds.insert(std::pair<std::string, FMOD::Channel*>(effect, channel));
 		}
@@ -108,24 +110,24 @@ StoryStep story[10] =
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	// TODO: Key callbacks for playing sound and whatnot
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS) { //edit background music
+		_channel = &(*bgmChannel);
+	}
+	else if (key == GLFW_KEY_2 && action == GLFW_PRESS){ //edit sound effects
+		_channel = &(*effChannel);
+	}
+	//controls are the same 1 or 2 just determines which one you are editing
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
+	/*
 	else if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-		std::cout << "Up key" << std::endl;
 		keyIndex = std::min((int) (keys.size() - 1), keyIndex + 1);
 	}
 	else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
 		keyIndex = std::max(0, keyIndex - 1);
 	}
-	else if (key == GLFW_KEY_P && action == GLFW_PRESS) {
-		//if current sound is paused=>unpause else pause
-		if (_channel) {
-			_result = _channel->getPaused(&_isPaused);
-			_result = _channel->setPaused(!_isPaused);
-			_result = _channel->getPaused(&_isPaused);
-		}
-	}
+	*/
 	else if (key == GLFW_KEY_P && action == GLFW_PRESS) {
 		//if current sound is paused=>unpause else pause
 		if (_channel) {
@@ -149,7 +151,7 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 		}
 	}
 	//Volume control
-	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && vol > 0.0f) {
+	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && vol > 0.1f) {
 		if (_channel) {
 			_result = _channel->getAudibility(&vol);
 			_result = _channel->setVolume(vol - 0.1f);
@@ -164,14 +166,14 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 		}
 	}
 	//pitch control
-	else if (key == GLFW_KEY_UP && action == GLFW_PRESS && pitch < 2.0f) {
+	else if (key == GLFW_KEY_U && action == GLFW_PRESS && pitch < 2.0f) {
 		if (_channel) {
 			_result = _channel->getPitch(&pitch);
 			_result = _channel->setPitch(pitch + 0.01f);
 			_result = _channel->getPitch(&pitch);
 		}
 	}
-	else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS && pitch > 0.0f) {
+	else if (key == GLFW_KEY_J && action == GLFW_PRESS && pitch > 0.0f) {
 		if (_channel) {
 			_result = _channel->getPitch(&pitch);
 			_result = _channel->setPitch(pitch - 0.01f);
@@ -179,19 +181,19 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 		}
 	}
 	//panning
-	else if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+	else if (key == GLFW_KEY_D && action == GLFW_PRESS) {//right headphone
 		if (_channel) {
 			pos = -1;
 			_result = _channel->setPan(pos);
 		}
 	}
-	else if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+	else if (key == GLFW_KEY_A && action == GLFW_PRESS) {//left headphone
 		if (_channel) {
 			pos = 1;
 			_result = _channel->setPan(pos);
 		}
 	}
-	else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+	else if (key == GLFW_KEY_S && action == GLFW_PRESS) {//center
 		if (_channel) {
 			pos = 0;
 			_channel->setPan(pos);
