@@ -54,6 +54,7 @@ static const char* fragment_shader =
 Shader* shader;
 
 FMOD::Channel* bgmChannel = NULL;
+FMOD::Channel* effectChannel = NULL;
 std::vector<std::string> _audioAssetsList;
 
 // Represents one "step" in the story
@@ -70,24 +71,24 @@ public:
 		PlaySound(bgmChannel, theme, false);
 	}
 
-	void PlayEffects(FMOD::Channel* channel)
+	void PlayEffects()
 	{
 		for (std::string effect : effects)
 		{
-			PlaySound(channel, effect, false);
+			PlaySound(bgmChannel, theme, false);
 		}
 	}
 };
 
 StoryStep story[7] =
 {
-	{"Once Upon a time...", "music_magical_story_intro.wav",  {"bird_small_song_call_chirp_02.wav"}, 700},
-	{"In the calm forest of Greenwood, there was a gnome called Chepart ...", "background_crowd_people_chatter_loop_02.wav",  {}, 700},
-	{"He lived in the city of Hazelward over the top of the trees ...", "",  {}, 700},
-	{"He loved how the people there were so festive ....", "",  {}, 700},
-	{"Chepart used to enjoy fishing at Crystal lake every afternoon ...", "music_calm_green_lake_serenade.wav",  { "river_stream_daytime_flowing_water_insects_birds_loop_01","crickets_chirping_night_ambience_loop.wav" }, 700},
-	{"One day he returned from the lake and had a strange feeling ...", "",  { "fantasy_jungle_forrest_loop_01.wav", "swamp_bayou_frogs_birds_daytime_loop1.wav" }, 700},
-	{"When he arrived at Hazelward, everyone in the city had become stone...", "cinematic_LowDrone1.wav",  { "bird_crow_call_caw_squawk_01.wav", "shimmer_sparkle_loop_02.wav", "music_cinematic_reveal.wav", "cinematic_deep_low_whoosh_impact_02.wav" }, 700},
+	{"Once Upon a time...", "music_magical_story_intro.wav",  {"bird_small_song_call_chirp_02.wav"}, 20},
+	{"In the calm forest of Greenwood, there was a gnome called Chepart ...", "background_crowd_people_chatter_loop_02.wav",  {}, 120},
+	{"He lived in the city of Hazelward over the top of the trees ...", "",  {}, 120},
+	{"He loved how the people there were so festive ....", "",  {}, 120},
+	{"Chepart used to enjoy fishing at Crystal lake every afternoon ...", "music_calm_green_lake_serenade.wav",  { "river_stream_daytime_flowing_water_insects_birds_loop_01","crickets_chirping_night_ambience_loop.wav" }, 120},
+	{"One day he returned from the lake and had a strange feeling ...", "",  { "fantasy_jungle_forrest_loop_01.wav", "swamp_bayou_frogs_birds_daytime_loop1.wav" }, 120},
+	{"When he arrived at Hazelward, everyone in the city had become stone...", "cinematic_LowDrone1.wav",  { "bird_crow_call_caw_squawk_01.wav", "shimmer_sparkle_loop_02.wav", "music_cinematic_reveal.wav", "cinematic_deep_low_whoosh_impact_02.wav" }, 120},
 };
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -187,10 +188,6 @@ int main(int argc, char* argv)
 		exit(EXIT_FAILURE);
 	}
 
-	int effectChannelIndex = 0;
-	const int effectChannelsCount = 10;
-	FMOD::Channel* effectChannels[effectChannelsCount];
-
 	int currentStoryIndex = 0;
 	float lineHeight = 500.0f;
 	int storyLength = sizeof(story) / sizeof(story[0]);
@@ -214,20 +211,13 @@ int main(int argc, char* argv)
 
 		if (!finishedStory && ticks != 0 && ticks % step.waitTime == 0)
 		{
-			if (effectChannelIndex >= effectChannelsCount)
-			{
-				fprintf(stderr, "Ran out of effect channels!");
-				return -1;
-			}
-
-			FMOD::Channel* currentEffectChannel = effectChannels[effectChannelIndex++];
 			// TODO: Do the sound modification here (frequency, volume, pitch, etc)
 
 			currentStoryIndex++;
 			lineHeight -= 60.0f;
 			linesToRender.push_back(std::pair<std::string, float>(story[currentStoryIndex].description, lineHeight));
 			step.PlayTheme();
-			step.PlayEffects(currentEffectChannel);
+			step.PlayEffects();
 		}
 
 		for (std::pair<std::string, float> pair : linesToRender)
@@ -235,7 +225,8 @@ int main(int argc, char* argv)
 			RenderText(shader, pair.first, 100.0f, pair.second, 0.8f, glm::vec3(0.5, 0.8f, 0.2f));
 		}
 
-		//std::cout << ticks << std::endl;
+		std::cout << ticks << std::endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 		ticks++;
 		glfwSwapBuffers(_window);
