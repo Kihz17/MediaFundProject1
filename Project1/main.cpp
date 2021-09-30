@@ -23,6 +23,9 @@ std::string _appName = "Project 1";
 FMOD::Channel* _channel = NULL;
 
 bool _isPaused = false;
+float vol = 1.0f; //volume
+float pitch = 1.0f; //pitch which controls frequency which is proportional to speed
+float pos = 0; //position of audio coming out of headphone (left, right, or both)
 
 static const char* vertex_shader =
 "#version 330 core\n"
@@ -89,10 +92,64 @@ StoryStep story[7] =
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	// TODO: Key callbacks for playing sound and whatnot
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-		//_result = _system->playSound(_sound, 0, false, &_channel);
-		//if (_result != FMOD_OK) {
-		//	fprintf(stderr, "Unable to play sound");
-		//}
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+	else if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+		//if current sound is paused=>unpause else pause
+		if (_channel) {
+			_result = _channel->getPaused(&_isPaused);
+			_result = _channel->setPaused(!_isPaused);
+			_result = _channel->getPaused(&_isPaused);
+		}
+	}
+	//Volume control
+	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && vol > 0.0f) {
+		if (_channel) {
+			_result = _channel->getAudibility(&vol);
+			_result = _channel->setVolume(vol - 0.1f);
+			_result = _channel->getAudibility(&vol);
+		}
+	}
+	else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS && vol < 1.0f) {
+		if (_channel) {
+			_result = _channel->getAudibility(&vol);
+			_result = _channel->setVolume(vol + 0.1f);
+			_result = _channel->getAudibility(&vol);
+		}
+	}
+	//pitch control
+	else if (key == GLFW_KEY_UP && action == GLFW_PRESS && pitch < 2.0f) {
+		if (_channel) {
+			_result = _channel->getPitch(&pitch);
+			_result = _channel->setPitch(pitch + 0.01f);
+			_result = _channel->getPitch(&pitch);
+		}
+	}
+	else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS && pitch > 0.0f) {
+		if (_channel) {
+			_result = _channel->getPitch(&pitch);
+			_result = _channel->setPitch(pitch - 0.01f);
+			_result = _channel->getPitch(&pitch);
+		}
+	}
+	//panning
+	else if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+		if (_channel) {
+			pos = -1;
+			_result = _channel->setPan(pos);
+		}
+	}
+	else if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+		if (_channel) {
+			pos = 1;
+			_result = _channel->setPan(pos);
+		}
+	}
+	else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+		if (_channel) {
+			pos = 0;
+			_channel->setPan(pos);
+		}
 	}
 }
 
