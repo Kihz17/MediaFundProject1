@@ -57,6 +57,10 @@ std::vector<std::string> _audioAssetsList;
 FMOD::Channel* bgmChannel = NULL;
 std::vector<FMOD::Channel*> effectChannels;
 
+std::map<std::string, FMOD::Channel*> playingSounds;
+std::vector<std::string> keys;
+int keyIndex = 0;
+
 // Represents one "step" in the story
 struct StoryStep
 {
@@ -71,6 +75,8 @@ public:
 		if (!theme.empty())
 		{
 			bgmChannel = *PlaySound(bgmChannel, theme, false);
+			keys.push_back(theme);
+			playingSounds.insert(std::pair<std::string, FMOD::Channel*>(theme, bgmChannel));
 		}
 	}
 
@@ -80,6 +86,8 @@ public:
 		for (std::string effect : effects)
 		{
 			effectChannels.push_back(*PlaySound(channel, theme, false));
+			keys.push_back(effect);
+			playingSounds.insert(std::pair<std::string, FMOD::Channel*>(effect, channel));
 		}
 	}
 };
@@ -99,6 +107,21 @@ static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, i
 	// TODO: Key callbacks for playing sound and whatnot
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+	else if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+		std::cout << "Up key" << std::endl;
+		keyIndex = std::min((int) (keys.size() - 1), keyIndex + 1);
+	}
+	else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+		keyIndex = std::max(0, keyIndex - 1);
+	}
+	else if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+		//if current sound is paused=>unpause else pause
+		if (_channel) {
+			_result = _channel->getPaused(&_isPaused);
+			_result = _channel->setPaused(!_isPaused);
+			_result = _channel->getPaused(&_isPaused);
+		}
 	}
 	else if (key == GLFW_KEY_P && action == GLFW_PRESS) {
 		//if current sound is paused=>unpause else pause
@@ -222,6 +245,19 @@ int main(int argc, char* argv)
 			if (!step.theme.empty())
 			{
 				_result = bgmChannel->stop();
+
+				// Remove the key from the key vector
+				std::vector<std::string>::iterator it;
+				for (it = keys.begin(); it != keys.end(); it++)
+				{
+					if (step.theme == *it)
+					{
+						it = keys.erase(it);
+						break;
+					}
+				}
+
+				playingSounds.erase(step.theme);
 			}
 
 			if (!step.effects.empty())
@@ -229,6 +265,25 @@ int main(int argc, char* argv)
 				for (FMOD::Channel* c : effectChannels)
 				{
 					c->stop();
+				}
+
+				// Remove the key from the key vector
+				std::vector<std::string>::iterator it;
+				for (it = keys.begin(); it != keys.end(); it++)
+				{
+					for (std::string effect : step.effects)
+					{
+						if (effect == *it)
+						{
+							it = keys.erase(it);
+							break;
+						}
+					}
+				}
+
+				for (std::string effect : step.effects)
+				{
+					playingSounds.erase(effect);
 				}
 			}
 
@@ -238,10 +293,22 @@ int main(int argc, char* argv)
 			step.PlayEffects();
 		}
 
+		std::string selectedSound = keys[keyIndex];
+		// Current sound is no longer valid, get the first entry in map
+		if (!playingSounds.count(selectedSound))
+		{
+			if (!keys.empty())
+			{
+				selectedSound = keys[0];
+			}
+		}
+
 		for (std::pair<std::string, float> pair : linesToRender)
 		{
 			RenderText(shader, pair.first, 100.0f, pair.second, 0.8f, glm::vec3(0.5, 0.8f, 0.2f));
 		}
+
+		RenderText(shader, "Current Selection: " + selectedSound, 200.0f, 700.0f, 0.8f, glm::vec3(0.5, 0.8f, 0.2f));
 
 		_system->update();
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
