@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <iostream>
 
 extern FMOD::System* _system;
 extern FMOD_RESULT _result;
@@ -15,10 +16,13 @@ FMOD::Sound* CreateSound(FMOD::System* system, std::string audioFile, std::strin
 FMOD::Sound* GetSound(std::string soundName);
 
 // Play a sound for this object
-void PlaySound(FMOD::Channel* channel, std::string soundName, bool isPaused);
+FMOD::Channel** PlaySound(FMOD::Channel* channel, std::string soundName, bool isPaused);
+
+// Stop a channel from playing
+void StopSound(FMOD::Channel* channel);
 
 // Pause the audio currenty playing
-void SetPause(FMOD::Channel* channel, bool isPaused);
+void SetPaused(FMOD::Channel* channel, bool isPaused);
 
 // Set the channel's frequency
 void SetFrequency(FMOD::Channel* channel, float frequency);

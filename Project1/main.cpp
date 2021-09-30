@@ -53,9 +53,9 @@ static const char* fragment_shader =
 
 Shader* shader;
 
-FMOD::Channel* bgmChannel = NULL;
-FMOD::Channel* effectChannel = NULL;
 std::vector<std::string> _audioAssetsList;
+FMOD::Channel* bgmChannel = NULL;
+std::vector<FMOD::Channel*> effectChannels;
 
 // Represents one "step" in the story
 struct StoryStep
@@ -68,27 +68,31 @@ struct StoryStep
 public:
 	void PlayTheme()
 	{
-		PlaySound(bgmChannel, theme, false);
+		if (!theme.empty())
+		{
+			bgmChannel = *PlaySound(bgmChannel, theme, false);
+		}
 	}
 
 	void PlayEffects()
 	{
+		FMOD::Channel* channel = NULL;
 		for (std::string effect : effects)
 		{
-			PlaySound(bgmChannel, theme, false);
+			effectChannels.push_back(*PlaySound(channel, theme, false));
 		}
 	}
 };
 
 StoryStep story[7] =
 {
-	{"Once Upon a time...", "music_magical_story_intro.wav",  {"bird_small_song_call_chirp_02.wav"}, 20},
-	{"In the calm forest of Greenwood, there was a gnome called Chepart ...", "background_crowd_people_chatter_loop_02.wav",  {}, 120},
+	{"Once Upon a time...", "music_magical_story_intro.wav",  {"bird_small_song_call_chirp_02.wav"}, 300},
+	{"In the calm forest of Greenwood, there was a gnome called Chepart ...", "background_crowd_people_chatter_loop_02.wav",  {}, 200},
 	{"He lived in the city of Hazelward over the top of the trees ...", "",  {}, 120},
 	{"He loved how the people there were so festive ....", "",  {}, 120},
-	{"Chepart used to enjoy fishing at Crystal lake every afternoon ...", "music_calm_green_lake_serenade.wav",  { "river_stream_daytime_flowing_water_insects_birds_loop_01","crickets_chirping_night_ambience_loop.wav" }, 120},
-	{"One day he returned from the lake and had a strange feeling ...", "",  { "fantasy_jungle_forrest_loop_01.wav", "swamp_bayou_frogs_birds_daytime_loop1.wav" }, 120},
-	{"When he arrived at Hazelward, everyone in the city had become stone...", "cinematic_LowDrone1.wav",  { "bird_crow_call_caw_squawk_01.wav", "shimmer_sparkle_loop_02.wav", "music_cinematic_reveal.wav", "cinematic_deep_low_whoosh_impact_02.wav" }, 120},
+	{"Chepart used to enjoy fishing at Crystal lake every afternoon ...", "music_calm_green_lake_serenade.wav",  { "river_stream_daytime_flowing_water_insects_birds_loop_01","crickets_chirping_night_ambience_loop.wav" }, 300},
+	{"One day he returned from the lake and had a strange feeling ...", "cinematic_LowDrone1.wav",  { "fantasy_jungle_forrest_loop_01.wav", "swamp_bayou_frogs_birds_daytime_loop1.wav" }, 200},
+	{"When he arrived at Hazelward, everyone in the city had become stone...", "",  { "bird_crow_call_caw_squawk_01.wav", "shimmer_sparkle_loop_02.wav", "music_cinematic_reveal.wav", "cinematic_deep_low_whoosh_impact_02.wav" }, 120},
 };
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -193,9 +197,9 @@ int main(int argc, char* argv)
 	int storyLength = sizeof(story) / sizeof(story[0]);
 	int ticks = 0;
 	std::vector<std::pair<std::string, float>> linesToRender;
-	linesToRender.push_back(std::pair<std::string, float>(story[currentStoryIndex].description, lineHeight));
 
-	StoryStep step = story[currentStoryIndex];
+	StoryStep& step = story[currentStoryIndex];
+	FMOD::Channel* lastThemeChannel = NULL;
 
 	while (!glfwWindowShouldClose(_window))
 	{
@@ -204,18 +208,32 @@ int main(int argc, char* argv)
 
 		//Playing the story
 		bool finishedStory = currentStoryIndex >= storyLength;
-		if (!finishedStory)
+		if (!finishedStory && ticks % step.waitTime == 0)
 		{
-			step = story[currentStoryIndex];
-		}
+			StoryStep lastStep = step;
 
-		if (!finishedStory && ticks != 0 && ticks % step.waitTime == 0)
-		{
 			// TODO: Do the sound modification here (frequency, volume, pitch, etc)
+			if (!finishedStory)
+			{
+				step = story[currentStoryIndex++];
+			}
 
-			currentStoryIndex++;
+			// Stop current sound effects if we have new ones
+			if (!step.theme.empty())
+			{
+				_result = bgmChannel->stop();
+			}
+
+			if (!step.effects.empty())
+			{
+				for (FMOD::Channel* c : effectChannels)
+				{
+					c->stop();
+				}
+			}
+
 			lineHeight -= 60.0f;
-			linesToRender.push_back(std::pair<std::string, float>(story[currentStoryIndex].description, lineHeight));
+			linesToRender.push_back(std::pair<std::string, float>(step.description, lineHeight));
 			step.PlayTheme();
 			step.PlayEffects();
 		}
@@ -225,7 +243,7 @@ int main(int argc, char* argv)
 			RenderText(shader, pair.first, 100.0f, pair.second, 0.8f, glm::vec3(0.5, 0.8f, 0.2f));
 		}
 
-		std::cout << ticks << std::endl;
+		_system->update();
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 		ticks++;

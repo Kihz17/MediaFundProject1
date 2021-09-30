@@ -38,18 +38,38 @@ FMOD::Sound* GetSound(std::string soundName)
 	}
 }
 
-
-void PlaySound(FMOD::Channel* channel, std::string soundName, bool isPaused)
+FMOD::Channel** PlaySound(FMOD::Channel* channel, std::string soundName, bool isPaused)
 {
 	FMOD::Sound* sound = GetSound(soundName);
+	FMOD::Channel** returnValue = &channel;
 	if (sound != NULL)
 	{
-		_system->playSound(sound, 0, isPaused, &channel);
+		_result = _system->playSound(sound, 0, isPaused, returnValue);
+		if (_result != FMOD_OK)
+		{
+			std::string error = "Unable to play sound." + _result;
+			fprintf(stderr, error.c_str());
+		}
+
+	}
+
+	return returnValue;
+}
+
+void StopSound(FMOD::Channel* channel)
+{
+	std::cout << "Stopping..." << std::endl;
+	_result = channel->stop();
+	if (_result != FMOD_OK)
+	{
+		std::string s = "Failed to stop channel." + _result;
+		fprintf(stderr, "Failed to stop channel.");
 	}
 }
 
 void SetPaused(FMOD::Channel* channel, bool isPaused)
 {
+	std::cout << "Pausing..." << std::endl;
 	_result = channel->setPaused(isPaused);
 	if (_result != FMOD_OK)
 	{
