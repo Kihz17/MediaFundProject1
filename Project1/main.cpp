@@ -235,7 +235,7 @@ int main(int argc, char* argv)
 			RenderText(shader, pair.first, 100.0f, pair.second, 0.8f, glm::vec3(0.5, 0.8f, 0.2f));
 		}
 
-		std::cout << ticks << std::endl;
+		//std::cout << ticks << std::endl;
 
 		ticks++;
 		glfwSwapBuffers(_window);

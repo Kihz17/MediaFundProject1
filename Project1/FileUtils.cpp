@@ -1,6 +1,6 @@
 #include "FileUtils.h"
 
-const std::string ASSETS_DIR = "common\\assets\\audio\\";
+const std::string ASSETS_DIR = "Extern\\assets\\audio\\";
 
 std::vector<std::string> GetFilesFromIndex(std::string indexFileName)
 {
