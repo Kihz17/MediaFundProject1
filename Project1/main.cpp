@@ -85,22 +85,25 @@ public:
 		FMOD::Channel* channel = NULL;
 		for (std::string effect : effects)
 		{
-			effectChannels.push_back(*PlaySound(channel, theme, false));
+			effectChannels.push_back(*PlaySound(channel, effect, false));
 			keys.push_back(effect);
 			playingSounds.insert(std::pair<std::string, FMOD::Channel*>(effect, channel));
 		}
 	}
 };
 
-StoryStep story[7] =
+StoryStep story[10] =
 {
-	{"Once Upon a time...", "music_magical_story_intro.wav",  {"bird_small_song_call_chirp_02.wav"}, 300},
-	{"In the calm forest of Greenwood, there was a gnome called Chepart ...", "background_crowd_people_chatter_loop_02.wav",  {}, 200},
+	{"Once Upon a time...", "music_magical_story_intro.wav",  {"bird_small_song_call_chirp_02.wav"}, 20},
+	{"In the calm forest of Greenwood, there was a gnome called Chepart ...", "",  {"background_crowd_people_chatter_loop_02.wav"}, 120},
 	{"He lived in the city of Hazelward over the top of the trees ...", "",  {}, 120},
-	{"He loved how the people there were so festive ....", "",  {}, 120},
-	{"Chepart used to enjoy fishing at Crystal lake every afternoon ...", "music_calm_green_lake_serenade.wav",  { "river_stream_daytime_flowing_water_insects_birds_loop_01","crickets_chirping_night_ambience_loop.wav" }, 300},
-	{"One day he returned from the lake and had a strange feeling ...", "cinematic_LowDrone1.wav",  { "fantasy_jungle_forrest_loop_01.wav", "swamp_bayou_frogs_birds_daytime_loop1.wav" }, 200},
-	{"When he arrived at Hazelward, everyone in the city had become stone...", "",  { "bird_crow_call_caw_squawk_01.wav", "shimmer_sparkle_loop_02.wav", "music_cinematic_reveal.wav", "cinematic_deep_low_whoosh_impact_02.wav" }, 120},
+	{"He loved how the people there were so festive ....", "music_calm_green_lake_serenade.wav",  {}, 80},
+	{"Chepart used to enjoy fishing at Crystal lake every afternoon ...", "",  {"river_stream_daytime_flowing_water_insects_birds_loop_01.wav","crickets_chirping_night_ambience_loop.wav" }, 120},
+	{"One day he returned from the lake and had a strange feeling ...", "",  { "fantasy_jungle_forrest_loop_01.wav","swamp_bayou_frogs_birds_daytime_loop1.wav" }, 120},
+	{"When he arrived at Hazelward, everyone in the city had become stone ...", "cinematic_LowDrone1.wav",  {}, 120},
+	{"What in the world could have done such terrible thing ...", "",  { "bird_crow_call_caw_squawk_01.wav","shimmer_sparkle_loop_02.wav" }, 80},
+	{"", "music_cinematic_reveal.wav",  { "cinematic_deep_low_whoosh_impact_02.wav" }, 120},
+	{"", "", {}, 120}
 };
 
 static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
